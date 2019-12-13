@@ -52,6 +52,46 @@ module AdvancedPS_Turing_Container
         return val
     end
 
+    # So far, we do this only for TypedVarInfo!!
+    # Task, make this generated!
+    function merge_traj!(vi::TypedVarInfo, vi_ref::TypedVarInfo)
+        # Get the indices of `vns` that belong to `spl` as a NamedTuple, one entry for each symbol
+        gidcs = _getidcs(vi, sel)
+        return _merge_traj!(vi.metadata, vi_ref.metadata, vi.num_produce)
+    end
+
+    @generated function _merge_traj!(vi::VarInfo{NamedTuple{names}}, metadata_ref::NamedTuple{namesref}, num_produce) where {names, namesref}
+        expr = Expr(:block)
+        for f in names
+            @assert f in namesref "[APS Turing Container] variable $name should be contained in the reference trajectory"
+            f_orders = :(metadata_ref.$f.orders)
+            f_flags = :(metadata_ref.$f.flags)
+            f_vals = :(metadata_ref.$f.vals)
+            f_dists = :(metadata_ref.$f.dist)
+            f_varnames =:(metadata_ref.$f.vns)
+            push!(expr.args, quote
+                for i in 1:length($f_orders)
+                    if $f_orders[i] > num_produce
+                        vn = $f_varnames[i]
+                        if haskey(vi,vn)
+                            if is_flagged(vi, vn, "del")
+                                unset_flag!(vi, vn, "del")
+                                vi[vn] = $f_vals[i]
+                                setgid!(vi, BASE_SELECTOR, vn)
+                                setorder!(vi, vn, $f_orders[i])
+                            else
+                                error("[APS Turing Container] This should not happen!")
+                        else
+                            #We do not specify the distribution... Thats why we set it to be Normal()
+                            push!(vi, vn, val, $f_dists[i])
+                        end
+                    end
+                end
+            end)
+        end
+        return expr
+    end
+
     #########################################################################
     # This is copied from turing compiler3.0, but we need to extract the    #
     # sampler form set_retained_vns_del_by_spl!                             #

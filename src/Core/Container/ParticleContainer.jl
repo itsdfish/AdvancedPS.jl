@@ -57,7 +57,7 @@ function Libtask.consume(pc::ParticleContainer)
     n = length(pc)
 
     particles = collect(pc)
-    num_done = 0
+    num_done = zeros(Int,n)
     for i=1:n
         p = particles[i]
         score = Libtask.consume(p)
@@ -66,16 +66,16 @@ function Libtask.consume(pc::ParticleContainer)
             reset_logp!(p.taskinfo)
             increase_logweight!(pc, i, Float64(score))
         elseif score == Val{:done}
-            num_done += 1
+            num_done[i] = 1 # We do not want to have locks!
         else
             println(score)
             error("[consume]: error in running particle filter.")
         end
     end
 
-    if num_done == n
+    if sum(num_done) == n
         res = Val{:done}
-    elseif num_done != 0
+    elseif sum(num_done) != 0
         error("[consume]: mis-aligned execution traces, num_particles= $(n), num_done=$(num_done).")
     else
         # update incremental likelihoods

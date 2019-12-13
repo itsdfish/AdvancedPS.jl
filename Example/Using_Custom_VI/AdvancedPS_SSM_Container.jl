@@ -100,6 +100,16 @@ module AdvancedPS_SSM_Container
         vi
     end
 
+    function merge_traj!(vi::Container, vi_ref::Container)
+        n_prod = vi.num_produce
+        for i in 1:length(vi_ref.x)
+            if  vi_ref.marked[i] && vi_ref.produced_at[i] > n_prod
+                vi.x[i,:] = vi_ref.x[i,:]
+                vi.marked[i] = true
+            end
+        end
+    end
+
     export  Container,
             tonamedtuple,
             get_traj,
