@@ -21,12 +21,13 @@ function PGAlgorithm(n::Int64)
 end
 
 
-struct PGASAlgorithm{RT} <:AbstractPGAlgorithm
+struct PGASAlgorithm{RT} <:AbstractPGAlgorithm where RT<:AbstractFloat
     resampler             ::  Function
     resampler_threshold   ::  RT
     n                     ::  Int64
+    proposal_a_w          ::  Bool
 end
 
 function PGASAlgorithm(n::Int64)
-    PGASAlgorithm(resample_systematic, 0.5, n)
+    PGASAlgorithm(resample_systematic, 0.5, n, false)
 end

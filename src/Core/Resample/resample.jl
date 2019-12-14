@@ -43,9 +43,9 @@ function resample!(
         # Insert the retained particle. This is based on the replaying trick for efficiency
         # reasons. If we implement PG using task copying, we need to store Nx * T particles!
         # This is a rather effcient way of how to solve the ancestor problem.
-        if ancestor_idx == n
+        if new_ref === nothing
             @inbounds children[n] = ref
-        elseif new_ref !== nothing
+        else
             @inbounds children[n] = new_ref
         end
     end

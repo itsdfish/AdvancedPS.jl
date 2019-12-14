@@ -40,6 +40,26 @@ end
 
 Sampler(alg:: ALG, uf::UF, vi::T) where {
     T,
-    ALG<: PGAlgorithm,
+    ALG<: Union{PGAlgorithm},
     UF<: PGUtilityFunctions
 } = PGSampler{Trace{typeof(vi),PGTaskInfo{Float64}},typeof(alg),typeof(uf),typeof(vi)}(alg, uf, nothing, vi)
+
+mutable struct PGASSampler{T, ALG, UF, C} <: AbstractPGSampler where {
+    T <:Particle,
+    ALG<:PGASAlgorithm,
+    UF<:PGASUtilityFunctions
+}
+    alg       :: ALG
+    uf        :: UF
+    ref_traj  :: Union{T, Nothing}
+    vi        :: C
+end
+
+function Sampler(alg::ALG, uf::UF, vi::T) where {
+    T,
+    ALG<: Union{PGASAlgorithm},
+    UF<: PGASUtilityFunctions
+}
+    taskinfo = PGASTaskInfo(alg.proposal_a_w)
+    PGASSampler{Trace{typeof(vi),typeof(taskinfo)},typeof(alg),typeof(uf),typeof(vi)}(alg, uf, nothing, vi)
+end

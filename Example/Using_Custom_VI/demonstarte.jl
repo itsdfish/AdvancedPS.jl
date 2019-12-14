@@ -1,16 +1,18 @@
 
 ## It is not yet a package...
+push!(LOAD_PATH, "/home/kongi/Julia-AdvancedPS/PGASAdvancedPS.jl/")
 
+using Revise
 
 using Distributions
 using AdvancedPS
 using BenchmarkTools
 
+
 dir = splitdir(splitdir(pathof(AdvancedPS))[1])[1]
 push!(LOAD_PATH,dir*"/Example/Using_Custom_VI/" )
 using AdvancedPS_SSM_Container
 const APSCont = AdvancedPS_SSM_Container
-
 
 # Define a short model.
 # The syntax is rather simple. Observations need to be reported with report_observation.
@@ -46,17 +48,22 @@ function task_f(y)
     end
 end
 
-
-tcontainer =  Container(zeros(n,1),Vector{Bool}(undef,n),Vector{Int}(zeros(n)),0)
+tcontainer =  Container(zeros(n,1),Vector{Bool}(falses(n)),Vector{Int}(zeros(n)),0)
 model = PFModel(task_f, (y=y,))
 
 
 
-alg = AdvancedPS.SMCAlgorithm()
-uf = AdvancedPS.SMCUtilityFunctions(APSCont.set_retained_vns_del_by_spl!, tonamedtuple)
-@btime sample(model, alg, uf, tcontainer, 10)
+#alg = AdvancedPS.SMCAlgorithm()
+#uf = AdvancedPS.SMCUtilityFunctions(APSCont.set_retained_vns_del_by_spl!, tonamedtuple)
+#sample(model, alg, uf, tcontainer, 10)
 
+alg = AdvancedPS.PGASAlgorithm(AdvancedPS.resample_systematic, 1.0, 10, false)
+uf = AdvancedPS.PGASUtilityFunctions( APSCont.set_retained_vns_del_by_spl!, APSCont.tonamedtuple, APSCont.merge_traj!)
+@elapsed chn2 =sample(model, alg, uf, tcontainer, 20)
 
 alg = AdvancedPS.PGAlgorithm(AdvancedPS.resample_systematic, 1.0, 10)
 uf = AdvancedPS.PGUtilityFunctions( APSCont.set_retained_vns_del_by_spl!, APSCont.tonamedtuple)
-@btime chn2 =sample(model, alg, uf, tcontainer, 5)
+@elapsed chn2 =sample(model, alg, uf, tcontainer, 20)
+
+
+summarize(chn2)

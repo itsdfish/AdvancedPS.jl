@@ -87,6 +87,7 @@ module AdvancedPS_Turing_Container
                         end
                     end
                 end
+                vi
             end)
         end
         return expr

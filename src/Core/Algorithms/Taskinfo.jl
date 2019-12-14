@@ -21,7 +21,7 @@ const PGTaskInfo = SMCTaskInfo
 
 
 
-mutable struct PGASTaskInfo{T, F, W} <: AbstractTaskInfo where {T <: AbstractFloat, W<:Union{AbstractFloat,Nothing}}
+mutable struct PGASTaskInfo{T, W} <: AbstractTaskInfo where {T <: AbstractFloat, W<:Union{AbstractFloat,Nothing}}
     # Same as above
     logp::T
     logpseq::T
@@ -29,9 +29,10 @@ mutable struct PGASTaskInfo{T, F, W} <: AbstractTaskInfo where {T <: AbstractFlo
     ancestor_weight::W
 end
 
-function PGASTaskInfo(logp::Float64,logpseq::Float64)
-    PGASTaskInfo(logp, logpseq, 0.0)
-end
+PGASTaskInfo() = PGASTaskInfo(0.0, 0.0, nothing)
+PGASTaskInfo(v::Bool) = (v ? PGASTaskInfo(0.0, 0.0, 0.0) : PGASTaskInfo())
+
+
 
 function Base.copy(info::PGTaskInfo)
     PGTaskInfo(info.logp, info.logpseq)
@@ -46,7 +47,7 @@ set_ancestor_weight!(ti::PGASTaskInfo, w::Float64) = (ti.ancestor_weight = w)
 @inline function reset_task_info!(ti::PGASTaskInfo)
     ti.logp = 0.0
     ti.logpseq = 0.0
-    ti.ancestor_weight = 0.0
+    ti.ancestor_weight = ti.ancestor_weight === nothing ? nothing : 0.0
 end
 
 @inline function reset_task_info!(ti::PGTaskInfo)

@@ -108,6 +108,7 @@ module AdvancedPS_SSM_Container
                 vi.marked[i] = true
             end
         end
+        vi
     end
 
     export  Container,
