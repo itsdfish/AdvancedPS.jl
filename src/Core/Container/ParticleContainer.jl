@@ -31,14 +31,14 @@ Base.@propagate_inbounds Base.getindex(pc::ParticleContainer, i::Int) = pc.vals[
 function Base.push!(pc::ParticleContainer, p::Particle)
     push!(pc.vals, p)
     push!(pc.logWs, 0.0)
-    return pc
+    pc
 end
 
 # clears the container but keep params, logweight etc.
 function Base.empty!(pc::ParticleContainer)
     pc.vals  = eltype(pc.vals)[]
     pc.logWs = Float64[]
-    return pc
+    pc
 end
 
 # clones a theta-particle
@@ -58,18 +58,35 @@ function Libtask.consume(pc::ParticleContainer)
 
     particles = collect(pc)
     num_done = zeros(Int,n)
-    for i=1:n
-        p = particles[i]
-        score = Libtask.consume(p)
-        if score isa Real
-            score += p.taskinfo.logp
-            reset_logp!(p.taskinfo)
-            increase_logweight!(pc, i, Float64(score))
-        elseif score == Val{:done}
-            num_done[i] = 1 # We do not want to have locks!
-        else
-            println(score)
-            error("[consume]: error in running particle filter.")
+    if parallelize()
+        Threads.@threads for i=1:n
+            p = particles[i]
+            score = Libtask.consume(p)
+            if score isa Real
+                score += p.taskinfo.logp
+                reset_logp!(p.taskinfo)
+                increase_logweight!(pc, i, Float64(score))
+            elseif score == Val{:done}
+                num_done[i] = 1 # We do not want to have locks!
+            else
+                println(score)
+                error("[consume]: error in running particle filter.")
+            end
+        end
+    else
+        for i=1:n
+            p = particles[i]
+            score = Libtask.consume(p)
+            if score isa Real
+                score += p.taskinfo.logp
+                reset_logp!(p.taskinfo)
+                increase_logweight!(pc, i, Float64(score))
+            elseif score == Val{:done}
+                num_done[i] = 1 # We do not want to have locks!
+            else
+                println(score)
+                error("[consume]: error in running particle filter.")
+            end
         end
     end
 

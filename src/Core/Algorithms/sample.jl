@@ -7,8 +7,13 @@ function sample!(pc::PC, alg::ALG, uf::AbstractSMCUtilitFunctions, ref_traj::T) 
     ALG <:Union{SMCAlgorithm, PGAlgorithm},
     T <:Union{Trace,Nothing}
 }
+    #tsample = 0.0
+    #tresample = 0.0
     n = length(pc.vals)
+    #t = time()
     while consume(pc) != Val{:done}
+        #tsample += time()-t
+        #t= time()
         ess = effectiveSampleSize(pc)
         if ref_traj !== nothing || ess <= alg.resampler_threshold * length(pc)
             # compute weights
@@ -25,7 +30,13 @@ function sample!(pc::PC, alg::ALG, uf::AbstractSMCUtilitFunctions, ref_traj::T) 
             ref_traj !== nothing ? push!(indx,n) : nothing
             resample!(pc, uf, indx, ref_traj)
         end
+        #tresample += time()-t
+        #t = time()
     end
+    #ration = tsample/tresample
+    #println("The ration is: $ration" )
+    #println("The resampling time is: $tresample" )
+    #println("The sampling time is: $tsample" )
     return pc
 end
 

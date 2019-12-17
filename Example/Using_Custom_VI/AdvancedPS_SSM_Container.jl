@@ -57,12 +57,12 @@ module AdvancedPS_SSM_Container
 
     @inline function update_var!(trace, vn::Int, r::Vector{<:Real})
         if !trace.vi.marked[vn]
-            trace.vi.x[vn,:] = r # We assume that it is already vectorized!!
+            trace.vi.x[:,vn] = r # We assume that it is already vectorized!!
             trace.vi.marked[vn] = true
             trace.vi.produced_at[vn] = trace.vi.num_produce
             return r
         end
-        return trace.vi.x[vn,:]
+        return trace.vi.x[:,vn]
     end
 
 
@@ -75,21 +75,25 @@ module AdvancedPS_SSM_Container
     end
 
     @inline function get_vn(trace, vn::Int)
-        return trace.vi.x[vn,:]
+        return trace.vi.x[: ,vn]
     end
 
     @inline function get_traj(trace)
-        return trace.vi.x[1:trace.vi.num_produce+1,:]
+        return trace.vi.x[:, 1:trace.vi.num_produce+1,]
     end
 
-    # The reason for this is that we need to pass it!
-    @inline function Base.copy(vi::Container)
-        Container(deepcopy(vi.x),deepcopy(vi.marked),deepcopy(vi.produced_at),copy(vi.num_produce))
-    end
 
     @inline function tonamedtuple(vi::Container)
-        tnames = Tuple([Symbol("x$i") for i in 1:size(vi.x)[1]])
-        tvalues = Tuple([vi.x[i,:] for i in 1:size(vi.x)[1]])
+        lnames = []
+        lvals = []
+        for i in 1:size(vi.x)[2]
+            tmp = [Symbol("x[$k, $i]") for k = 1:size(vi.x)[1]]
+            lnames = append!(lnames, tmp )
+            tmp = [vi.x[k, i] for k = 1:size(vi.x)[1]]
+            lvals = append!(lvals, tmp)
+        end
+        tnames = Tuple(lnames)
+        tvalues = Tuple(lvals)
         return namedtuple(tnames, tvalues)
     end
 
@@ -102,9 +106,10 @@ module AdvancedPS_SSM_Container
 
     function merge_traj!(vi::Container, vi_ref::Container)
         n_prod = vi.num_produce
-        for i in 1:length(vi_ref.x)
+        for i in 1:length(vi_ref.marked)
             if  vi_ref.marked[i] && vi_ref.produced_at[i] > n_prod
-                vi.x[i,:] = vi_ref.x[i,:]
+                vi.x[:, i] = @view vi_ref.x[:, i]
+                vi.produced_at[i] = vi_ref.produced_at[i]
                 vi.marked[i] = true
             end
         end
@@ -120,7 +125,8 @@ module AdvancedPS_SSM_Container
             report_transition!,
             set_retained_vns_del_by_spl,
             update_var!,
-            initialize
+            initialize,
+            merge_traj!
 
 
 end

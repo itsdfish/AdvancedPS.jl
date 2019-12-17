@@ -35,9 +35,17 @@ function resample!(
             for _ in 2:ni
                 children[j += 1] = fork(p,  isref, utility_functions.set_retained_vns_del_by_spl!)
             end
+        else
+            # We want to manually delet every particle !
+            p = particles[i]
+            for (key, value) in p.task.storage
+                if occursin("CuArray", string(typeof(value)))
+                    release_gpu_mem(value)
+                end
+                p.task.storage[key] = nothing
+            end
         end
     end
-
     if ref !== nothing
         ancestor_idx = indx[n]
         # Insert the retained particle. This is based on the replaying trick for efficiency

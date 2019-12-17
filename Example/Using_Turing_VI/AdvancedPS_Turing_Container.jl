@@ -54,36 +54,44 @@ module AdvancedPS_Turing_Container
 
     # So far, we do this only for TypedVarInfo!!
     # Task, make this generated!
-    function merge_traj!(vi::TypedVarInfo, vi_ref::TypedVarInfo)
+    @inline function merge_traj!(vi::TypedVarInfo, vi_ref::TypedVarInfo)
         # Get the indices of `vns` that belong to `spl` as a NamedTuple, one entry for each symbol
-        gidcs = _getidcs(vi, sel)
-        return _merge_traj!(vi.metadata, vi_ref.metadata, vi.num_produce)
+        return _merge_traj!(vi, vi_ref.metadata, vi.num_produce)
     end
 
-    @generated function _merge_traj!(vi::VarInfo{NamedTuple{names}}, metadata_ref::NamedTuple{namesref}, num_produce) where {names, namesref}
+    @generated function _merge_traj!(vi::VarInfo, metadata_ref::NamedTuple{namesref}, num_produce) where {namesref}
         expr = Expr(:block)
-        for f in names
-            @assert f in namesref "[APS Turing Container] variable $name should be contained in the reference trajectory"
+        for f in namesref
             f_orders = :(metadata_ref.$f.orders)
             f_flags = :(metadata_ref.$f.flags)
             f_vals = :(metadata_ref.$f.vals)
-            f_dists = :(metadata_ref.$f.dist)
+            f_dists = :(metadata_ref.$f.dists)
             f_varnames =:(metadata_ref.$f.vns)
             push!(expr.args, quote
                 for i in 1:length($f_orders)
                     if $f_orders[i] > num_produce
                         vn = $f_varnames[i]
+                        fi = metadata_ref.$f
                         if haskey(vi,vn)
-                            if is_flagged(vi, vn, "del")
-                                unset_flag!(vi, vn, "del")
-                                vi[vn] = $f_vals[i]
-                                setgid!(vi, BASE_SELECTOR, vn)
-                                setorder!(vi, vn, $f_orders[i])
-                            else
-                                error("[APS Turing Container] This should not happen!")
+                            unset_flag!(vi, vn, "del")
+                            vi[vn] = Array(view(fi.vals, fi.ranges[fi.idcs[vn]]))
+                            setgid!(vi, BASE_SELECTOR, vn)
+                            setorder!(vi, vn, $f_orders[i])
                         else
                             #We do not specify the distribution... Thats why we set it to be Normal()
-                            push!(vi, vn, val, $f_dists[i])
+                            val = Array(view(fi.vals, fi.ranges[fi.idcs[vn]]))
+                            dist = $f_dists[i]
+                            meta = vi.metadata.$f
+                            meta.idcs[vn] = length(meta.idcs) + 1
+                            push!(meta.vns, vn)
+                            l = length(meta.vals); n = length(val)
+                            push!(meta.ranges, l+1:l+n)
+                            append!(meta.vals, val)
+                            push!(meta.dists, dist)
+                            push!(meta.gids, Set{Turing.Selector}([])) # Because we do not have a sampler...
+                            push!(meta.orders, $f_orders[i])
+                            push!(meta.flags["del"], false)
+                            push!(meta.flags["trans"], false)
                         end
                     end
                 end
@@ -247,5 +255,6 @@ module AdvancedPS_Turing_Container
             report_transition!,
             set_retained_vns_del_by_spl,
             update_var!,
-            initialize
+            initialize,
+            merge_traj!
 end

@@ -21,5 +21,3 @@ end
 
 #@elapsed sample(demo(),PG(10),5)
 chn = @elapsed sample(demo(y), SMC(), 100)
-
-chn.na.axes

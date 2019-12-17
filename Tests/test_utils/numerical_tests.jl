@@ -71,6 +71,28 @@ function check_numerical(chain1,
 end
 
 
+# Compare two chains
+# This is hardcoded !!!
+function check_numerical_custom(chain1,
+                        chain2,
+                        T = 11, # We usually compare onlf for 11
+                        atol=0.2,
+                        rtol=0.0
+                        )
+    for t = 1:T
+        sym = Symbol("x[$t]")
+        symc = Symbol("x[1,$t]")
+        val = chain2[sym].value[1] isa Real ?
+            mean(chain2[sym].value) :
+            vec(mean(chain2[sym].value, dims=[1]))
+        E = val isa Real ?
+            mean(chain1[symc].value) :
+            vec(mean(chain1[symc].value, dims=[1]))
+        @info (symbol=sym, exact=val, evaluated=E)
+        @test E ≈ val atol=atol rtol=rtol
+    end
+end
+
 
 # Wrapper function to quickly check gdemo accuracy.
 function check_gdemo(chain; atol=0.2, rtol=0.0)

@@ -10,20 +10,20 @@ end
 gdemo_default = gdemo_d()
 
 function gdemo_d_apf()
-    var = initialize()
+    var = APSTCont.initialize()
     r = rand(InverseGamma(2, 3))
     vn = @varname s
-    s = update_var!(var, vn, r)
+    s = APSTCont.update_var!(var, vn, r)
 
     r =  rand(Normal(0, sqrt(s)))
     vn = @varname m
-    m = update_var!(var, vn, r)
+    m = APSTCont.update_var!(var, vn, r)
 
     logp = logpdf(Normal(m, sqrt(s)), 1.5)
-    report_observation!(var,logp)
+    APSTCont.report_observation!(var,logp)
 
     logp = logpdf(Normal(m, sqrt(s)), 2.0)
-    report_observation!(var,logp)
+    APSTCont.report_observation!(var,logp)
 end
 
 
@@ -39,44 +39,90 @@ aps_gdemo_default = gdemo_d_apf
 end
 
 function large_demo_apf(y)
-    var = initialize()
-    x = TArray{Float64}(undef,11)
+    var = APSTCont.initialize()
+    x = Turing.TArray{Float64}(undef,11)
     vn = @varname x[1]
-    x[1] = update_var!(var, vn, rand(Normal()))
+    x[1] = APSTCont.update_var!(var, vn, rand(Normal()))
     # there is nothing to report since we are not using proposal sampling
-    report_transition!(var,0.0,0.0)
+    logp = logpdf(Normal(), x[1])
+    APSTCont.report_transition!(var,logp,logp)
     for i = 2:11
         # Sampling
         r =  rand( Normal(0.1*x[i-1]-0.1,0.5))
         vn = @varname x[i]
-        x[i] = update_var!(var, vn, r)
+        x[i] = APSTCont.update_var!(var, vn, r)
         logγ = logpdf( Normal(0.1*x[i-1]-0.1,0.5),x[i]) #γ(x_t|x_t-1)
         logp = logγ             # p(x_t|x_t-1)
-        report_transition!(var,logp,logγ)
+        APSTCont.report_transition!(var,logp,logγ)
         #Proposal and Resampling
         logpy = logpdf(Normal(x[i], 0.3), y[i-1])
-        var = report_observation!(var,logpy)
+        var = APSTCont.report_observation!(var,logpy)
     end
 end
 
 ## Here, we even have a proposal distributin
 function large_demo_apf_proposal(y)
-    var = initialize()
-    x = TArray{Float64}(undef,11)
+    var = APSTCont.initialize()
+    x = Turing.TArray{Float64}(undef,11)
     vn = @varname x[1]
-    x[1] = update_var!(var, vn, rand(Normal()))
+    x[1] = APSTCont.update_var!(var, vn, rand(Normal()))
+    logp = logpdf(Normal(), x[1])
+
     # there is nothing to report since we are not using proposal sampling
-    report_transition!(var,0.0,0.0)
+    APSTCont.report_transition!(var,logp,logp)
     for i = 2:11
         # Sampling
         r =  rand(Normal(0.1*x[i-1],0.5))
         vn = @varname x[i]
-        x[i] = update_var!(var, vn, r)
+        x[i] = APSTCont.update_var!(var, vn, r)
         logγ = logpdf(Normal(0.1*x[i-1],0.5),x[i]) #γ(x_t|x_t-1)
         logp = logpdf( Normal(0.1*x[i-1]-0.1,0.5),x[i])             # p(x_t|x_t-1)
-        report_transition!(var,logp,logγ)
+        APSTCont.report_transition!(var,logp,logγ)
         #Proposal and Resampling
         logpy = logpdf(Normal(x[i], 0.3), y[i-1])
-        var = report_observation!(var,logpy)
+        var = APSTCont.report_observation!(var,logpy)
+    end
+end
+
+function large_demo_apf_c(y)
+    var = CustomCont.initialize()
+    x = Turing.TArray{Float64}(undef,11)
+    x[1:1] = CustomCont.update_var!(var, 1, rand(Normal(),1))
+    # there is nothing to report since we are not using proposal sampling
+    logp = logpdf(Normal(), x[1])
+
+    CustomCont.report_transition!(var,logp,logp)
+    for i = 2:11
+        # Sampling
+        r =  rand( Normal(0.1*x[i-1]-0.1,0.5),1)
+        x[i:i] = CustomCont.update_var!(var, i, r)
+        logγ = logpdf( Normal(0.1*x[i-1]-0.1,0.5),x[i]) #γ(x_t|x_t-1)
+        logp = logγ             # p(x_t|x_t-1)
+        CustomCont.report_transition!(var,logp,logγ)
+        #Proposal and Resampling
+        logpy = logpdf(Normal(x[i], 0.3), y[i-1])
+        var = CustomCont.report_observation!(var,logpy)
+    end
+end
+
+## Here, we even have a proposal distributin
+function large_demo_apf_proposal_c(y)
+    var = CustomCont.initialize()
+    x = Turing.TArray{Float64}(undef,11)
+    x[1:1] = CustomCont.update_var!(var, 1, rand(Normal(),1))
+    logp = logpdf(Normal(), x[1])
+
+    # there is nothing to report since we are not using proposal sampling
+    CustomCont.report_transition!(var,logp,logp)
+    for i = 2:11
+        # Sampling
+        r =  rand(Normal(0.1*x[i-1],0.5),1)
+        x[i:i] = CustomCont.update_var!(var, i, r)
+        logγ = logpdf(Normal(0.1*x[i-1],0.5),x[i]) #γ(x_t|x_t-1)
+        logp = logpdf( Normal(0.1*x[i-1]-0.1,0.5),x[i])             # p(x_t|x_t-1)
+        CustomCont.report_transition!(var,logp,logγ)
+        #Proposal and Resampling
+        logpy = logpdf(Normal(x[i], 0.3), y[i-1])
+        var = CustomCont.report_observation!(var,logpy)
     end
 end

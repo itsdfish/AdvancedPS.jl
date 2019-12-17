@@ -13,23 +13,23 @@
     @apf_testset "particle container" begin
         n = Ref(0)
         alg = AdvancedPS.PGAlgorithm(5)
-        uf = AdvancedPS.SMCUtilityFunctions(set_retained_vns_del_by_spl!,  tonamedtuple)
+        uf = AdvancedPS.SMCUtilityFunctions(APSTCont.set_retained_vns_del_by_spl!,  APSTCont.tonamedtuple)
 
         dist = Normal(0, 1)
 
         function fpc()
-            t = TArray(Float64, 1);
-            var = initialize()
+            t = Turing.TArray(Float64, 1);
+            var = APSTCont.initialize()
             t[1] = 0;
             while true
                 vn = @varname x[n]
                 r = rand(dist)
-                update_var!(var, vn, r)
+                APSTCont.update_var!(var, vn, r)
                 n[] += 1
-                produce(0)
+                Libtask.produce(0)
                 var = current_trace()
                 r = rand(dist)
-                update_var!(var, vn, r)
+                APSTCont.update_var!(var, vn, r)
                 t[1] = 1 + t[1]
             end
         end
@@ -62,21 +62,21 @@
     @apf_testset "trace" begin
         n = Ref(0)
         alg = AdvancedPS.PGAlgorithm(5)
-        uf = AdvancedPS.SMCUtilityFunctions( set_retained_vns_del_by_spl!,  tonamedtuple)
+        uf = AdvancedPS.SMCUtilityFunctions(APSTCont.set_retained_vns_del_by_spl!,  APSTCont.tonamedtuple)
         dist = Normal(0, 1)
         function f2()
-            t = TArray(Float64, 1);
-            var = initialize()
+            t = Turing.TArray(Float64, 1);
+            var = APSTCont.initialize()
             t[1] = 0;
             while true
                 vn = @varname x[n]
                 r = rand(dist)
-                update_var!(var, vn, r)
-                produce(t[1]);
+                APSTCont.update_var!(var, vn, r)
+                Libtask.produce(t[1]);
                 var = current_trace()
                 vn = @varname x[n]
                 r = rand(dist)
-                update_var!(var, vn, r)
+                APSTCont.update_var!(var, vn, r)
                 t[1] = 1 + t[1]
             end
         end
