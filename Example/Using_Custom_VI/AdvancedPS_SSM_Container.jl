@@ -81,7 +81,9 @@ module AdvancedPS_SSM_Container
     @inline function get_traj(trace)
         return trace.vi.x[:, 1:trace.vi.num_produce+1,]
     end
-
+    @inline function increase_logjointp(trace, v::Real)
+        increase_logjointp!(trace.taskinfo, v)
+    end
 
     @inline function tonamedtuple(vi::Container)
         lnames = []

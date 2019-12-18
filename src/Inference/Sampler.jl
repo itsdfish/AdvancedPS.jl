@@ -55,6 +55,9 @@ mutable struct PGASSampler{T, ALG, UF, C} <: AbstractPGSampler where {
     vi        :: C
 end
 
+
+
+
 function Sampler(alg::ALG, uf::UF, vi::T) where {
     T,
     ALG<: Union{PGASAlgorithm},
@@ -62,4 +65,28 @@ function Sampler(alg::ALG, uf::UF, vi::T) where {
 }
     taskinfo = PGASTaskInfo(alg.proposal_a_w)
     PGASSampler{Trace{typeof(vi),typeof(taskinfo)},typeof(alg),typeof(uf),typeof(vi)}(alg, uf, nothing, vi)
+end
+
+
+mutable struct PGASSamplerFullStates{T, ALG, UF, C} <: AbstractPGSampler where {
+    T<:       Particle,
+    ALG<:     PGASAlgorithm,
+    UF<:      PGASUtilityFunctions,
+    PC<:      ParticleContainer
+}
+    alg       :: ALG
+    uf        :: UF
+    ref_traj  :: Union{T, Nothing}
+    vi        :: C
+    pc        :: PC
+end
+
+function Sampler(alg::ALG, uf::UF, vi::T) where {
+    T,
+    ALG<: Union{PGASFullStatesAlgorithm},
+    UF<: PGASUtilityFunctions
+}
+    taskinfo = PGASTaskInfo(alg.proposal_a_w)
+    pc = ParticleContainer(Trace{typeof(vi),typeof(taskinfo)}[])
+    PGASSamplerFullStates{Trace{typeof(vi),typeof(taskinfo)},typeof(alg),typeof(uf),typeof(vi)}(alg, uf, nothing, vi, pc)
 end

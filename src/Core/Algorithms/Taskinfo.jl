@@ -26,7 +26,7 @@ mutable struct PGASTaskInfo{T, W} <: AbstractTaskInfo where {T <: AbstractFloat,
     logp::T
     logpseq::T
     # The ancestor weight
-    ancestor_weight::W
+    logjointp::W
 end
 
 PGASTaskInfo() = PGASTaskInfo(0.0, 0.0, nothing)
@@ -38,19 +38,25 @@ function Base.copy(info::PGTaskInfo)
     PGTaskInfo(info.logp, info.logpseq)
 end
 function Base.copy(info::PGASTaskInfo)
-     PGASTaskInfo(info.logp, info.logpseq, info.ancestor_weight)
+     PGASTaskInfo(info.logp, info.logpseq, info.logjointp)
 end
 
 reset_logp!(ti::AbstractTaskInfo) = (ti.logp = 0.0)
-set_ancestor_weight!(ti::PGASTaskInfo, w::Float64) = (ti.ancestor_weight = w)
+set_logjointp!(ti::PGASTaskInfo, w::Float64) = (ti.logjointp = w)
 
 @inline function reset_task_info!(ti::PGASTaskInfo)
     ti.logp = 0.0
     ti.logpseq = 0.0
-    ti.ancestor_weight = ti.ancestor_weight === nothing ? nothing : 0.0
+    ti.logjointp = ti.logjointp === nothing ? nothing : 0.0
 end
 
 @inline function reset_task_info!(ti::PGTaskInfo)
     ti.logp = 0.0
     ti.logpseq = 0.0
+end
+@inline function reset_logjointp!(ti::PGASTaskInfo)
+    ti.logjointp = 0.0
+end
+@inline function increase_logjointp!(ti::PGASTaskInfo, v::Real)
+    ti.logjointp += v
 end

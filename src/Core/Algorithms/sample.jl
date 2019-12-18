@@ -44,7 +44,7 @@ end
 
 function sample!(pc::PC, alg::ALG, uf::AbstractSMCUtilitFunctions, ref_traj::T) where {
     PC <:ParticleContainer,
-    ALG <:Union{PGASAlgorithm},
+    ALG <:Union{PGASAlgorithm, PGASFullStatesAlgorithm},
     T <:Union{Trace,Nothing}
 }
     if ref_traj === nothing
@@ -85,9 +85,10 @@ function sample!(pc::PC, alg::ALG, uf::AbstractSMCUtilitFunctions, ref_traj::T) 
         resample!(pc, uf, indx, ref_traj, ancestor_particle)
         ref_traj = ancestor_particle=== nothing ? ref_traj : ancestor_particle # update reference trajectory
         # In this case, we do have access to the joint_logp ! Therefore:
-        if typeof(pc[1].taskinfo.ancestor_weight) !== Nothing
+        if typeof(pc[1].taskinfo.logjointp) !== Nothing
             for (i,t) in enumerate(pc.vals)
-                logAs[i] += t.taskinfo.ancestor_weight - logpseq[i]  # The ancestor weights w_ancstor = w_i *p(x_{0:t-1},x_{t:T})/p(x_{0:t-1})
+                logAs[i] += t.taskinfo.logjointp - logpseq[i]  # The ancestor weights w_ancstor = w_i *p(x_{0:t-1},x_{t:T})/p(x_{0:t-1})
+                reset_logjointp!(t.taskinfo)
             end
         else
             if pc.n_consume <= num_total_consume-1 #We do not need to sample the last one...

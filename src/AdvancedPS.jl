@@ -74,7 +74,8 @@ module AdvancedPS
                 forkr,
                 get_new_trace,
                 release_gpu_mem,
-                parallelize
+                parallelize,
+                increase_logjointp
 
         include("Inference/Model.jl")
         include("Inference/Transitions.jl")
