@@ -1,0 +1,30 @@
+language: julia
+
+# avoids duplicate tests in PRs
+branches:
+  only:
+    - master
+
+coveralls: true
+
+os:
+  - linux
+  - osx
+
+julia:
+  - 1.3
+  - nightly
+
+matrix:
+  allow_failures:
+    - julia: nightly
+    - os: osx
+  fast_finish: true
+  include:
+    - os: linux
+      arch: x64
+    - os: linux
+      arch: x86
+
+notifications:
+  email: false
