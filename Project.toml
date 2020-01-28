@@ -16,8 +16,7 @@ Turing = "fce5fe82-541a-59a6-adf8-730c64b5f9a0"
 [compat]
 julia = "1"
 AbstractMCMC = "^0.1.0"
-Turing = "^0.8.3"
-MCMCChains = "^1.0.0"
+Turing = "^0.8.0"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
