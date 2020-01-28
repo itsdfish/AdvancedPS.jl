@@ -1,4 +1,4 @@
-using AdvancedPS, Random, Turing, Parameters, Distributions
+using AdvancedPS, Test, Random, Turing, Parameters, Distributions
 import AdvancedPS: select_groups, select_particles, shift_particles!, sample_init
 cd(@__DIR__)
 @testset "Binomial Model" begin
