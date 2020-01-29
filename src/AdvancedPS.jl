@@ -1,5 +1,5 @@
 module AdvancedPS
-    using Random, AbstractMCMC, StatsBase, ProgressMeter, Parameters, Distributions
+    using Random, StatsBase, ProgressMeter, Parameters, Distributions
     import AbstractMCMC: step!, AbstractSampler, AbstractTransition, transition_type
     import AbstractMCMC: bundle_samples, sample, psample, AbstractModel
     import MCMCChains: Chains
