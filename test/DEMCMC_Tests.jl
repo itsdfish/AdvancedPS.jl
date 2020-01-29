@@ -1,6 +1,10 @@
 using AdvancedPS, Test, Random, Turing, Parameters, Distributions
 import AdvancedPS: select_groups, select_particles, shift_particles!, sample_init
 cd(@__DIR__)
+println("Starting DE-MCMC test file")
+println()
+println()
+println()
 @testset "Binomial Model" begin
     Random.seed!(29542)
     N = 10
