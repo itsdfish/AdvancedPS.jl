@@ -1,7 +1,8 @@
 """
 Performs crossover step for each particle pt in the chain
+* `model`: model containing a likelihood function with data and priors
 * `de`: differential evolution object
-* `chain`: a chain containing particles
+* `group`: a group of particles
 """
 function crossover!(model, de, group)
     for pt in group
@@ -18,6 +19,7 @@ end
 Generate proposal according to θ' = θt + γ1(θm − θn) + γ2(θb − θt) + b
 γ2=0 after burnin
 * `de`: differential evolution object
+* `Pt`: current particle
 * `group`: a group of particles
 """
 # 2.38/sqrt(2d)
@@ -59,7 +61,7 @@ end
 Resets parameters of proposal to previous value with probability
 (1-κ).
 * `pp`: proposal particle
-* `pt`: target partical
+* `pt`: current partical
 """
 function recombination!(de, pt, pp)
     de.κ == 1.0 ? (return nothing) : nothing

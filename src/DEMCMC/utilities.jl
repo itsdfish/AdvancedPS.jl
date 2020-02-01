@@ -1,4 +1,10 @@
-
+"""
+Initializes values for a particle
+* `model`: model containing a likelihood function with data and priors
+* `de`: differential evolution object
+* `p`: a particle
+* `n_iter`: the number of iterations
+"""
 function init_particle!(model, de, p, n_iter)
     N = n_iter - de.burnin
     p.samples = typeof(p.samples)(undef,N,length(p.Θ))
@@ -60,6 +66,11 @@ function enforce_bounds!(bounds, p)
     return nothing
 end
 
+"""
+Returns parameters names.
+* `model`: model containing a likelihood function with data and priors
+* `p`: a particle
+"""
 function get_names(model, p)
     N = length.(p.Θ)
     parm_names = fill("", sum(N))
@@ -226,7 +237,7 @@ function -(x::Particle, y::Real)
     return Particle(Θ=z)
 end
 
-#handle intergers
+# arithmatic methods for hanlding discrete parameters
 *′(x, y) = x*y
 *′(x::Int64, y::Float64) = Int(round(x*y))
 *′(x::Float64, y::Int64) = Int(round(x*y))

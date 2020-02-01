@@ -1,5 +1,6 @@
 """
 Mutates each particle
+* `model`: model containing a likelihood function with data and priors
 * `de`: differential evolution object
 * `group`: a group of particles
 """

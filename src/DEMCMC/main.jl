@@ -40,7 +40,7 @@ Function signature
 ```
 """
 function psample(model::Model, de::DE, n_iter::Int; kwargs...)
-    _sample(model::Model, de::DE, n_iter::Int; plot_fun=_f, stepfun=pstep!, kwargs...)
+    _sample(model::Model, de::DE, n_iter::Int; stepfun=pstep!, kwargs...)
 end
 
 """

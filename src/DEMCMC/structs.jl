@@ -84,6 +84,7 @@ end
 * `samples`: a 2-dimensional array containing all acccepted proposals
 * `accept`: proposal acceptance. 1: accept, 0: reject
 * `weight`: particle weight based on model fit (currently posterior log likelihood)
+* `lp`: a vector of log posterior probabilities associated with each accepted proposal
 """
 mutable struct Particle{T} <: AbstractTransition
     Θ::Vector{T}
