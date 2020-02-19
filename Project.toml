@@ -19,7 +19,7 @@ Turing = "fce5fe82-541a-59a6-adf8-730c64b5f9a0"
 [compat]
 AdvancedHMC = "0.2"
 Distributions = "0.22"
-MCMCChains = "1.0"
+MCMCChains = "1.0, 2.0"
 Parameters = "0.12"
 ProgressMeter = "1.2"
 Requires = "^0.5.0"
