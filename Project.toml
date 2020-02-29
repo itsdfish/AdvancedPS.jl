@@ -24,7 +24,7 @@ Parameters = "0.12"
 ProgressMeter = "1.2"
 Requires = "^0.5.0"
 StatsBase = "0.32"
-Turing = "^0.8.0"
+Turing = "^0.8.0, 0.9"
 julia = "1"
 
 [extras]
