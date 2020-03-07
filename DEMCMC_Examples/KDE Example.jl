@@ -1,5 +1,5 @@
 cd(@__DIR__)
-using Revise, AdvancedPS, Random, KernelDensity, Distributions
+using AdvancedPS, Random, KernelDensity, Distributions
 include("KDE.jl")
 
 function loglike(μ, σ, data)

@@ -1,6 +1,12 @@
 # Note: poor performance
+
+
+
+# this may not be working properly
+
+
 cd(@__DIR__)
-using Revise, AdvancedPS, Random, StatsBase, Distributions
+using AdvancedPS, Random, StatsBase, Distributions
 
 N = 30
 # Parameters for each cluster, we assume that each cluster is Gaussian distributed in the example.

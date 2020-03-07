@@ -86,7 +86,7 @@ end
 * `weight`: particle weight based on model fit (currently posterior log likelihood)
 * `lp`: a vector of log posterior probabilities associated with each accepted proposal
 """
-mutable struct Particle{T} <: AbstractTransition
+mutable struct Particle{T}
     Θ::Vector{T}
     samples::Array{T,2}
     accept::Vector{Bool}

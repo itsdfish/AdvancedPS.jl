@@ -1,5 +1,5 @@
 cd(@__DIR__)
-using Revise, AdvancedPS, Random, Parameters, Distributions
+using AdvancedPS, Random, Parameters, Distributions
 
 priors = (
     θ=(Beta(1, 1),),
