@@ -2,9 +2,6 @@ using AdvancedPS, Test, Random, Turing, Parameters, Distributions
 import AdvancedPS: select_groups, select_particles, shift_particles!, sample_init
 cd(@__DIR__)
 println("Starting DE-MCMC test file")
-println()
-println()
-println()
 @testset "Binomial Model" begin
     Random.seed!(29542)
     N = 10
@@ -27,9 +24,9 @@ println()
     de = DE(;priors=priors, bounds=bounds, burnin=1500)
     n_iter = 3000
     chains = sample(model, de, n_iter)
-    μθ = describe(chains)[1].df[:,:mean][1]
-    σθ = describe(chains)[1].df[:,:std][1]
-    rhat = describe(chains)[1].df[:,:r_hat][1]
+    μθ = describe(chains)[1][:,:mean][1]
+    σθ = describe(chains)[1][:,:std][1]
+    rhat = describe(chains)[1][:,:r_hat][1]
     solution = Beta(k+1,N-k+1)
     @test μθ ≈ mean(solution) rtol = .02
     @test σθ ≈ std(solution) rtol = .02
@@ -40,7 +37,7 @@ end
     Random.seed!(899801)
     priors = (
         μ=(Normal(0, 10),),
-        σ=(Truncated(Cauchy(0, 1), 0.0, Inf),)
+        σ=(truncated(Cauchy(0, 1), 0.0, Inf),)
     )
 
     bounds = ((-Inf,Inf),(0.0,Inf))
@@ -56,20 +53,20 @@ end
     de = DE(;priors=priors, bounds=bounds, burnin=1500)
     n_iter = 3000
     chains = sample(model, de, n_iter)
-    μ_de = describe(chains)[1].df[:,:mean]
-    σ_de = describe(chains)[1].df[:,:std]
-    rhat = describe(chains)[1].df[:,:r_hat]
+    μ_de = describe(chains)[1][:,:mean]
+    σ_de = describe(chains)[1][:,:std]
+    rhat = describe(chains)[1][:,:r_hat]
 
     @model model(data) = begin
         μ ~ Normal(0, 10)
-        σ ~ Truncated(Cauchy(0, 1), 0.0, Inf)
+        σ ~ truncated(Cauchy(0, 1), 0.0, Inf)
         for i in 1:length(data)
             data[i] ~ Normal(μ, σ)
         end
     end
     chn = psample(model(data), NUTS(1000, .85), 2000, 4)
-    μ_nuts = describe(chn)[1].df[:,:mean]
-    σ_nuts = describe(chn)[1].df[:,:std]
+    μ_nuts = describe(chn)[1][:,:mean]
+    σ_nuts = describe(chn)[1][:,:std]
 
     @test all(isapprox.(rhat, fill(1.0, 2), atol = .05))
     @test all(isapprox.(μ_nuts, μ_de, rtol = .03))
@@ -92,29 +89,29 @@ end
     loglike(θ) = loglike(θ..., data)
 
     minRT = minimum(x->x[2], data)
-    priors = (μ=(Normal(0, 3), 4),σ=(Truncated(Cauchy(0,1), 0.0, Inf),),
+    priors = (μ=(Normal(0, 3), 4),σ=(truncated(Cauchy(0,1), 0.0, Inf),),
         ϕ=(Uniform(0.,minRT),))
     bounds = ((-Inf,0.),(1e-10,Inf),(0.,minRT))
     model = Model(priors=priors, model=loglike)
     de = DE(;priors=priors, bounds=bounds, burnin=1500)
     n_iter = 3000
     chains = sample(model, de, n_iter)
-    μ_de = describe(chains)[1].df[:,:mean]
-    σ_de = describe(chains)[1].df[:,:std]
-    rhat = describe(chains)[1].df[:,:r_hat]
+    μ_de = describe(chains)[1][:,:mean]
+    σ_de = describe(chains)[1][:,:std]
+    rhat = describe(chains)[1][:,:r_hat]
 
 
     @model model(data) = begin
         minRT = minimum(x->x[2], data)
         μ ~ MvNormal(zeros(4), 3)
-        σ ~ Truncated(Cauchy(0, 1), 0.0, Inf)
+        σ ~ truncated(Cauchy(0, 1), 0.0, Inf)
         ϕ ~ Uniform(0.0, minRT)
         data ~ LNR(μ=μ, σ=σ, ϕ=ϕ)
     end
 
     chn = psample(model(data), NUTS(1000, .85), 2000, 4)
-    μ_nuts = describe(chn)[1].df[:,:mean]
-    σ_nuts = describe(chn)[1].df[:,:std]
+    μ_nuts = describe(chn)[1][:,:mean]
+    σ_nuts = describe(chn)[1][:,:std]
 
     @test all(isapprox.(rhat, fill(1.0, 6), atol = .05))
     @test all(isapprox.(μ_nuts, μ_de, rtol = .04))
