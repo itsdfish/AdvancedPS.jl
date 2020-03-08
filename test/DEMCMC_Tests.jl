@@ -19,7 +19,7 @@ println("Starting DE-MCMC test file")
 
     loglike(θ) = loglike(θ..., data)
 
-    model = Model(priors=priors, model=loglike)
+    model = DEModel(priors=priors, model=loglike)
 
     de = DE(;priors=priors, bounds=bounds, burnin=1500)
     n_iter = 3000
@@ -49,7 +49,7 @@ end
     end
 
     loglike(θ) = loglike(θ..., data)
-    model = Model(priors=priors, model=loglike)
+    model = DEModel(priors=priors, model=loglike)
     de = DE(;priors=priors, bounds=bounds, burnin=1500)
     n_iter = 3000
     chains = sample(model, de, n_iter)
@@ -92,7 +92,7 @@ end
     priors = (μ=(Normal(0, 3), 4),σ=(truncated(Cauchy(0,1), 0.0, Inf),),
         ϕ=(Uniform(0.,minRT),))
     bounds = ((-Inf,0.),(1e-10,Inf),(0.,minRT))
-    model = Model(priors=priors, model=loglike)
+    model = DEModel(priors=priors, model=loglike)
     de = DE(;priors=priors, bounds=bounds, burnin=1500)
     n_iter = 3000
     chains = sample(model, de, n_iter)
@@ -145,7 +145,7 @@ end
 
     loglike(θ) = loglike(θ..., data)
 
-    model = Model(priors=priors, model=loglike)
+    model = DEModel(priors=priors, model=loglike)
     de = DE(;priors=priors, bounds=bounds, burnin=1500)
     n_iter = 3000
     groups = sample_init(model, de, n_iter)

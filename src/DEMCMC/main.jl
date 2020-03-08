@@ -6,12 +6,12 @@ Samples from the posterior distribution
 
 Function signature
 ```@example
-    sample(model::Model, de::DE, n_iter::Int; kwargs...)
+    sample(model::DEModel, de::DE, n_iter::Int; kwargs...)
 ```
 """
-sample(model::Model, de::DE, n_iter::Int; kwargs...) = _sample(model::Model, de::DE, n_iter::Int; stepfun=step!, kwargs...)
+sample(model::DEModel, de::DE, n_iter::Int; kwargs...) = _sample(model::DEModel, de::DE, n_iter::Int; stepfun=step!, kwargs...)
 
-function _sample(model::Model, de::DE, n_iter::Int; stepfun=step!, kwargs...)
+function _sample(model::DEModel, de::DE, n_iter::Int; stepfun=step!, kwargs...)
     # progress meter
     meter = Progress(n_iter)
     # initialize particles based on prior distribution
@@ -36,11 +36,11 @@ the mutation and crossover steps.
 
 Function signature
 ```@example
-    psample(model::Model, de::DE, n_iter::Int; kwargs...)
+    psample(model::DEModel, de::DE, n_iter::Int; kwargs...)
 ```
 """
-function psample(model::Model, de::DE, n_iter::Int; kwargs...)
-    _sample(model::Model, de::DE, n_iter::Int; stepfun=pstep!, kwargs...)
+function psample(model::DEModel, de::DE, n_iter::Int; kwargs...)
+    _sample(model::DEModel, de::DE, n_iter::Int; stepfun=pstep!, kwargs...)
 end
 
 """
@@ -49,14 +49,14 @@ Perform a single step for DE-MCMC.
 * `de`: DE-MCMC sampler object
 * `groups`: Array of vectors of particles
 """
-function step!(model::Model, de::DE, groups)
+function step!(model::DEModel, de::DE, groups)
     rand() <= de.α ? migration!(de, groups) : nothing
     groups = mutate_crossover!(model, de, groups)
     store_samples!(de, groups)
     return groups
 end
 
-function pstep!(model::Model, de::DE, groups)
+function pstep!(model::DEModel, de::DE, groups)
     rand() <= de.α ? migration!(de, groups) : nothing
     groups = pmutate_crossover!(model, de, groups)
     store_samples!(de, groups)
@@ -111,7 +111,7 @@ and posterior summaries
 * `groups`: a vector of groups of particles
 * `n_iter`: number of iterations
 """
-function bundle_samples(model::Model, de::DE, groups, n_iter)
+function bundle_samples(model::DEModel, de::DE, groups, n_iter)
     particles = vcat(groups...)
     Np = length(particles)
     Ns = n_iter- de.burnin
@@ -138,7 +138,7 @@ Creates vectors of particles and samples initial parameter values from priors
 * `de`: differential evolution object
 * `n_iter`: number of iterations
 """
-function sample_init(model::Model, de::DE, n_iter)
+function sample_init(model::DEModel, de::DE, n_iter)
     groups = [[Particle(Θ=sample_prior(model.priors)) for p in 1:de.Np]
         for c in 1:de.n_groups]
     for group in groups

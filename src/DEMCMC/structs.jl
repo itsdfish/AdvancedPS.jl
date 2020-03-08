@@ -54,15 +54,15 @@ A model object containing the log likelihood function and prior distributions
 * `model`: log likelihood function
 * `names`: parameter names
 """
-struct Model{F,L,T} <: AbstractModel where {F<:Function,L,T}
+struct DEModel{F,L,T} <: AbstractModel where {F<:Function,L,T}
     priors::L
     model::F
     names::T
 end
 
-function Model(;priors, model, names=String.(keys(priors)))
+function DEModel(;priors, model, names=String.(keys(priors)))
     priors′ = values(priors)
-    return Model(priors′, model, names)
+    return DEModel(priors′, model, names)
  end
 
 """

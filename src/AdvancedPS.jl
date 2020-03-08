@@ -3,7 +3,7 @@ module AdvancedPS
     import AbstractMCMC: step!, AbstractSampler, AbstractModel
     import AbstractMCMC: bundle_samples, sample, psample
     import MCMCChains: Chains
-    export DE, Particle, Model, sample, psample
+    export DE, Particle, DEModel, sample, psample
     include("DEMCMC/structs.jl")
     include("DEMCMC/main.jl")
     include("DEMCMC/migration.jl")

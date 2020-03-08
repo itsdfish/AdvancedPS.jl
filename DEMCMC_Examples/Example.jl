@@ -18,7 +18,7 @@ end
 
 loglike(θ) = loglike(θ..., data)
 
-model = Model(priors=priors, model=loglike)
+model = DEModel(priors=priors, model=loglike)
 
 de = DE(bounds=bounds, burnin=1000, priors=priors, progress=true)
 n_iter = 2000
