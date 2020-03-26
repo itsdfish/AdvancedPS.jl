@@ -23,7 +23,7 @@ MCMCChains = "1.0, 3.0"
 Parameters = "0.12"
 ProgressMeter = "1.2"
 StatsBase = "0.32"
-Turing = "^0.8.0, 0.9"
+Turing = "^0.8.0, 0.9, 0.10"
 julia = "1"
 
 [extras]
