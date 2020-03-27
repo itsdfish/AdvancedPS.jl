@@ -38,14 +38,13 @@ mutable struct DE{T1} <: AbstractSampler
     σ::Float64
     κ::Float64
     bounds::T1
-    visualize::Bool
     iter::Int64
     progress::Bool
 end
 
 function DE(;n_groups=4, priors=nothing, Np=num_parms(priors)*3, burnin=1000, α=.1, β=.1, ϵ=.001, σ=.05,
-    κ=1.0, bounds, visualize=false, progress=true)
-    return DE(n_groups, Np, burnin, α, β, ϵ, σ, κ, bounds, visualize, 1, progress)
+    κ=1.0, bounds, progress=true)
+    return DE(n_groups, Np, burnin, α, β, ϵ, σ, κ, bounds, 1, progress)
 end
 
 """

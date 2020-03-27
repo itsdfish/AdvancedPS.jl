@@ -124,7 +124,6 @@ end
 findtype(p) = Union{unique(typeof.(p))...}
 returntype(t, p) = t[p...]
 
-
 """
 Update particle based on Metropolis-Hastings rule.
 * `de`: differential evolution object
