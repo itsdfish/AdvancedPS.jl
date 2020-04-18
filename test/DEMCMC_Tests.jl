@@ -78,7 +78,7 @@ end
 @testset "LNR" begin
     using AdvancedPS, Test, Random, Turing, Parameters, Distributions
     import AdvancedPS: select_groups, select_particles, shift_particles!, sample_init
-    Random.seed!(8675309)
+    Random.seed!(46391)
     include("LogNormalRace.jl")
 
     dist = LNR(μ=[-2.,-2.,-3.,-3], σ=1.0, ϕ=.5)
@@ -96,8 +96,8 @@ end
         ϕ=(Uniform(0.,minRT),))
     bounds = ((-Inf,0.),(1e-10,Inf),(0.,minRT))
     model = DEModel(priors=priors, model=loglike)
-    de = DE(;priors=priors, bounds=bounds, burnin=1500)
-    n_iter = 3000
+    de = DE(;priors=priors, bounds=bounds, burnin=2000)
+    n_iter = 4000
     chains = sample(model, de, n_iter)
     μ_de = describe(chains)[1][:,:mean]
     σ_de = describe(chains)[1][:,:std]
@@ -117,10 +117,9 @@ end
     σ_nuts = describe(chn)[1][:,:std]
 
     @test all(isapprox.(rhat, fill(1.0, 6), atol = .05))
-    @test all(isapprox.(μ_nuts, μ_de, rtol = .04))
-    @test all(isapprox.(σ_nuts, σ_de, rtol = .04))
+    @test all(isapprox.(μ_nuts, μ_de, rtol = .05))
+    @test all(isapprox.(σ_nuts, σ_de, rtol = .05))
 end
-
 
 function equal(p1::Particle, p2::Particle)
     fields = fieldnames(Particle)
