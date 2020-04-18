@@ -1,8 +1,8 @@
-using AdvancedPS, Test, Random, Turing, Parameters, Distributions
-import AdvancedPS: select_groups, select_particles, shift_particles!, sample_init
 cd(@__DIR__)
-println("Starting DE-MCMC test file")
+
 @testset "Binomial Model" begin
+    using AdvancedPS, Test, Random, Turing, Parameters, Distributions
+    import AdvancedPS: select_groups, select_particles, shift_particles!, sample_init
     Random.seed!(29542)
     N = 10
     k = rand(Binomial(N, .5))
@@ -34,7 +34,9 @@ println("Starting DE-MCMC test file")
 end
 
 @testset "Gaussian" begin
-    Random.seed!(899801)
+    using AdvancedPS, Test, Random, Turing, Parameters, Distributions
+    import AdvancedPS: select_groups, select_particles, shift_particles!, sample_init
+    Random.seed!(899501)
     priors = (
         μ=(Normal(0, 10),),
         σ=(truncated(Cauchy(0, 1), 0.0, Inf),)
@@ -73,8 +75,9 @@ end
     @test all(isapprox.(σ_nuts, σ_de, rtol = .03))
 end
 
-
 @testset "LNR" begin
+    using AdvancedPS, Test, Random, Turing, Parameters, Distributions
+    import AdvancedPS: select_groups, select_particles, shift_particles!, sample_init
     Random.seed!(8675309)
     include("LogNormalRace.jl")
 
@@ -131,6 +134,8 @@ function equal(p1::Particle, p2::Particle)
 end
 
 @testset "Migration" begin
+    using AdvancedPS, Test, Random, Turing, Parameters, Distributions
+    import AdvancedPS: select_groups, select_particles, shift_particles!, sample_init
     Random.seed!(0451)
     priors = (
         θ=(Beta(1,1),),
