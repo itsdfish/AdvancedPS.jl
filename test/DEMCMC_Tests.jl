@@ -36,7 +36,7 @@ end
 @testset "Gaussian" begin
     using AdvancedPS, Test, Random, Turing, Parameters, Distributions
     import AdvancedPS: select_groups, select_particles, shift_particles!, sample_init
-    Random.seed!(899501)
+    Random.seed!(839510)
     priors = (
         μ=(Normal(0, 10),),
         σ=(truncated(Cauchy(0, 1), 0.0, Inf),)
@@ -66,19 +66,19 @@ end
             data[i] ~ Normal(μ, σ)
         end
     end
-    chn = psample(model(data), NUTS(1000, .85), 2000, 4)
+    chn = sample(model(data), NUTS(1000, .85), MCMCThreads(), 2000, 4)
     μ_nuts = describe(chn)[1][:,:mean]
     σ_nuts = describe(chn)[1][:,:std]
 
     @test all(isapprox.(rhat, fill(1.0, 2), atol = .05))
-    @test all(isapprox.(μ_nuts, μ_de, rtol = .03))
+    @test all(isapprox.(μ_nuts, μ_de, atol = .01))
     @test all(isapprox.(σ_nuts, σ_de, rtol = .03))
 end
 
 @testset "LNR" begin
     using AdvancedPS, Test, Random, Turing, Parameters, Distributions
     import AdvancedPS: select_groups, select_particles, shift_particles!, sample_init
-    Random.seed!(46391)
+    Random.seed!(463591)
     include("LogNormalRace.jl")
 
     dist = LNR(μ=[-2.,-2.,-3.,-3], σ=1.0, ϕ=.5)
@@ -103,7 +103,6 @@ end
     σ_de = describe(chains)[1][:,:std]
     rhat = describe(chains)[1][:,:r_hat]
 
-
     @model model(data) = begin
         minRT = minimum(x->x[2], data)
         μ ~ MvNormal(zeros(4), 3)
@@ -112,7 +111,7 @@ end
         data ~ LNR(μ=μ, σ=σ, ϕ=ϕ)
     end
 
-    chn = psample(model(data), NUTS(1000, .85), 2000, 4)
+    chn = sample(model(data), NUTS(1000, .85), MCMCThreads(), 2000, 4)
     μ_nuts = describe(chn)[1][:,:mean]
     σ_nuts = describe(chn)[1][:,:std]
 

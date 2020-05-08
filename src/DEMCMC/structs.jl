@@ -17,8 +17,7 @@ Constructor signature:
 
 ```@example
 DE(;n_groups=4, priors=nothing, Np=num_parms(priors)*3,burnin=1000,
-    α=.1, β=.1, ϵ=.001, σ=.05, bounds, parallel=false,
-    visualize=false, iter=1, progress=false)
+    α=.1, β=.1, ϵ=.001, σ=.05, bounds, visualize=false, iter=1, progress=false)
 ```
 References:
 

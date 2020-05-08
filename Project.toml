@@ -18,7 +18,7 @@ StatsBase = "2913bbd2-ae8a-5f71-8c99-4fb6c76f3a91"
 Turing = "fce5fe82-541a-59a6-adf8-730c64b5f9a0"
 
 [compat]
-AbstractMCMC = "0.5, 1.0"
+AbstractMCMC = "0.5, 1.0.0"
 AdvancedHMC = "0.2,^0.5"
 Bijectors = "0.6, 0.7"
 Distributions = "0.22, 0.23"
@@ -28,7 +28,7 @@ ProgressMeter = "1.2"
 Requires = "1.0"
 SafeTestsets = "0.0.1"
 StatsBase = "0.32,0.33"
-Turing = "^0.8.0, 0.9,0.10,0.11.0"
+Turing = "0.12.0"
 julia = "1"
 
 [extras]
