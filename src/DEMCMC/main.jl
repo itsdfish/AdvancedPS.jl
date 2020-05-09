@@ -11,8 +11,7 @@ Function signature
 """
 sample(model::DEModel, de::DE, n_iter::Int; kwargs...) = _sample(model::DEModel, de::DE, n_iter::Int; stepfun=step!, kwargs...)
 
-function _sample(model::DEModel, de::DE, n_iter::Int; stepfun=step!, kwargs...)
-    # progress meter
+function _sample(model::DEModel, de::DE, n_iter::Int; progress=false, stepfun=step!, kwargs...)
     meter = Progress(n_iter)
     # initialize particles based on prior distribution
     groups = sample_init(model, de, n_iter)
@@ -20,7 +19,7 @@ function _sample(model::DEModel, de::DE, n_iter::Int; stepfun=step!, kwargs...)
         de.iter = iter
         # explicitly pass groups so parallel works
         groups = stepfun(model, de, groups)
-        de.progress ? next!(meter) : nothing
+        progress ? next!(meter) : nothing
     end
     # convert to chain object
     chain = bundle_samples(model, de, groups, n_iter)
@@ -39,8 +38,8 @@ Function signature
     psample(model::DEModel, de::DE, n_iter::Int; kwargs...)
 ```
 """
-function psample(model::DEModel, de::DE, n_iter::Int; kwargs...)
-    _sample(model::DEModel, de::DE, n_iter::Int; stepfun=pstep!, kwargs...)
+function sample(model::DEModel, de::DE, ::MCMCThreads, n_iter::Int; progress=false, kwargs...)
+    _sample(model::DEModel, de::DE, n_iter::Int; progress=progress, stepfun=pstep!, kwargs...)
 end
 
 """

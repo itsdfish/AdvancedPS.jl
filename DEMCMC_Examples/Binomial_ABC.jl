@@ -25,7 +25,7 @@ loglike(θ) = loglike(θ..., data)
 
 model = DEModel(priors=priors, model=loglike)
 
-de = DE(bounds=bounds, burnin=1000, priors=priors, progress=true, σ=.01)
+de = DE(bounds=bounds, burnin=1000, priors=priors, σ=.01)
 n_iter = 2000
-@elapsed chains = psample(model, de, n_iter)
+@elapsed chains = sample(model, de, MCMCThreads(), n_iter, progress=true)
 println(chains)

@@ -1,9 +1,9 @@
 module AdvancedPS
     using Random, StatsBase, ProgressMeter, Parameters, Distributions
     import AbstractMCMC: step!, AbstractSampler, AbstractModel
-    import AbstractMCMC: bundle_samples, sample, psample
+    import AbstractMCMC: bundle_samples, sample, MCMCThreads
     import MCMCChains: Chains
-    export DE, Particle, DEModel, sample, psample
+    export DE, Particle, DEModel, sample, MCMCThreads
     include("DEMCMC/structs.jl")
     include("DEMCMC/main.jl")
     include("DEMCMC/migration.jl")
